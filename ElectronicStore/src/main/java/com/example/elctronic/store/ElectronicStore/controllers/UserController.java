@@ -3,6 +3,7 @@ package com.example.elctronic.store.ElectronicStore.controllers;
 import com.example.elctronic.store.ElectronicStore.dtos.ApiResponseMessage;
 import com.example.elctronic.store.ElectronicStore.dtos.UserDto;
 import com.example.elctronic.store.ElectronicStore.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,13 +14,15 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
+    @Autowired
     private UserService userService;
+
     //create
     @PostMapping
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto)
     {
-        UserDto user = userService.createUser(userDto);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        UserDto userDto1 = userService.createUser(userDto);
+        return new ResponseEntity<>(userDto1, HttpStatus.CREATED);
     }
 
     //update

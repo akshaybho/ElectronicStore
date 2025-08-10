@@ -2,16 +2,19 @@ package com.example.elctronic.store.ElectronicStore.services.impl;
 
 import com.example.elctronic.store.ElectronicStore.dtos.UserDto;
 import com.example.elctronic.store.ElectronicStore.entities.User;
+import com.example.elctronic.store.ElectronicStore.exception.ResourceNotFoundException;
 import com.example.elctronic.store.ElectronicStore.repositories.UserRepository;
 import com.example.elctronic.store.ElectronicStore.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -27,6 +30,7 @@ public class UserServiceImpl implements UserService {
 
         //dto -> entity
         User user = dtoToEntity(userDto);
+        user.setUserId(userId);
         User savedUser = userRepository.save(user);
 
         //entity -> dto
@@ -37,7 +41,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(UserDto userDto, String userId) {
 
-        User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found!!"));
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found!!"));
 
         user.setName(userDto.getName());
         user.setAbout(userDto.getAbout());
@@ -54,7 +58,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(String userId) {
 
-        User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found !!"));
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User not found !!"));
         userRepository.delete(user);
     }
 
@@ -67,13 +71,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserById(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User with "+userId+" is not found!!"));
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User with "+userId+" is not found!!"));
         return entityToDto(user);
     }
 
     @Override
     public UserDto getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("User with "+email+" is not found!!"));
+        User user = userRepository.findByEmail(email).orElseThrow(()-> new ResourceNotFoundException("User with "+email+" is not found!!"));
         return entityToDto(user);
     }
 
