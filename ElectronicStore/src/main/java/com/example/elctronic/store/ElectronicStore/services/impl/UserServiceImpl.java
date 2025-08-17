@@ -1,8 +1,10 @@
 package com.example.elctronic.store.ElectronicStore.services.impl;
 
+import com.example.elctronic.store.ElectronicStore.dtos.PageableResponse;
 import com.example.elctronic.store.ElectronicStore.dtos.UserDto;
 import com.example.elctronic.store.ElectronicStore.entities.User;
 import com.example.elctronic.store.ElectronicStore.exception.ResourceNotFoundException;
+import com.example.elctronic.store.ElectronicStore.helper.Helper;
 import com.example.elctronic.store.ElectronicStore.repositories.UserRepository;
 import com.example.elctronic.store.ElectronicStore.services.UserService;
 import org.modelmapper.ModelMapper;
@@ -10,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
@@ -67,14 +70,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUser(int pageNumber, int pageSize) {
+    public PageableResponse<UserDto> getAllUser(int pageNumber, int pageSize, String sortBy, String sortDir) {
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Sort sort = (sortDir.equalsIgnoreCase("desc")) ? (Sort.by(sortBy).descending()):(Sort.by(sortBy).ascending());
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<User> page = userRepository.findAll(pageable);
-        List <User> users = page.getContent();
 
-        List <UserDto> userDto = users.stream().map(user->entityToDto(user)).collect(Collectors.toList());
-        return userDto;
+        PageableResponse<UserDto> response = Helper.getPageableResponse(page, UserDto.class);
+
+        return response;
     }
 
     @Override

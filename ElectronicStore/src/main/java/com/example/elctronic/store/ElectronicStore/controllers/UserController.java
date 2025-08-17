@@ -1,6 +1,7 @@
 package com.example.elctronic.store.ElectronicStore.controllers;
 
 import com.example.elctronic.store.ElectronicStore.dtos.ApiResponseMessage;
+import com.example.elctronic.store.ElectronicStore.dtos.PageableResponse;
 import com.example.elctronic.store.ElectronicStore.dtos.UserDto;
 import com.example.elctronic.store.ElectronicStore.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,14 +51,15 @@ public class UserController {
 
     //get all
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers(
+    public ResponseEntity<PageableResponse<UserDto>> getAllUsers(
 
             @RequestParam (value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
-            @RequestParam (value = "pageSize", defaultValue = "10", required = false) int pageSize
+            @RequestParam (value = "pageSize", defaultValue = "10", required = false) int pageSize,
+            @RequestParam (value = "sortBy", defaultValue = "name", required = false) String sortBy,
+            @RequestParam (value = "sortDir", defaultValue = "asc", required = false) String sortDir
     )
     {
-        List<UserDto> allUsers = userService.getAllUser(pageNumber, pageSize);
-        return new ResponseEntity<>(allUsers, HttpStatus.OK);
+        return new ResponseEntity<>(userService.getAllUser(pageNumber, pageSize, sortBy, sortDir), HttpStatus.OK);
     }
 
     //get single
@@ -75,6 +77,7 @@ public class UserController {
         UserDto singleUser = userService.getUserByEmail(email);
         return new ResponseEntity<>(singleUser, HttpStatus.OK);
     }
+
     //search user
     @GetMapping("/search/{keywords}")
     public ResponseEntity<List<UserDto>> searchUser(@PathVariable String keywords)
