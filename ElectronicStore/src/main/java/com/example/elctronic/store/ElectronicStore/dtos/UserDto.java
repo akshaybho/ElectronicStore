@@ -31,6 +31,5 @@ public class UserDto {
 
     private String about;
 
-    @ImageNameValid
     private String imageName;
 }
