@@ -55,7 +55,7 @@ public class FileServiceImpl implements FileService {
 
         String fullPath = path + File.separator + name;
 
-        InputStream inputSTream = new FileInputStream(fullPath);
-        return null;
+        InputStream inputStream = new FileInputStream(fullPath);
+        return inputStream;
     }
 }
