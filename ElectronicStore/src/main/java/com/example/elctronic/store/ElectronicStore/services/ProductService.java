@@ -3,8 +3,6 @@ package com.example.elctronic.store.ElectronicStore.services;
 import com.example.elctronic.store.ElectronicStore.dtos.PageableResponse;
 import com.example.elctronic.store.ElectronicStore.dtos.ProductDto;
 
-import java.util.List;
-
 public interface ProductService {
 
     //create

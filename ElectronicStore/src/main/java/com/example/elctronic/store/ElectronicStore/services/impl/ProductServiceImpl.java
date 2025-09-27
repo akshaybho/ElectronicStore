@@ -9,13 +9,18 @@ import com.example.elctronic.store.ElectronicStore.repositories.ProductRepositor
 import com.example.elctronic.store.ElectronicStore.services.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -27,11 +32,16 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ModelMapper mapper;
 
+    @Value("product.image.path")
+    private String imagePath;
+
     @Override
     public ProductDto create(ProductDto productDto) {
 
         String productId = UUID.randomUUID().toString();
         productDto.setId(productId);
+
+        productDto.setAddedDate(new Date());
 
         Product product = mapper.map(productDto, Product.class);
         Product savedProduct = productRepository.save(product);
@@ -51,6 +61,7 @@ public class ProductServiceImpl implements ProductService {
         product.setQuantity(productDto.getQuantity());
         product.setLive(productDto.isLive());
         product.setStock(product.isStock());
+        product.setProductImageName(productDto.getProductImageName());
 
         Product updatedProduct = productRepository.save(product);
         return mapper.map(updatedProduct, ProductDto.class);
@@ -61,7 +72,18 @@ public class ProductServiceImpl implements ProductService {
     public void delete(String productId) {
 
         Product product = productRepository.findById(productId).orElseThrow(()-> new ResourceNotFoundException("Product with this id is not found!!"));
-        productRepository.delete(product);
+        //productRepository.delete(product);
+
+        String fullPath = imagePath + product.getProductImageName();
+        try{
+            Path path = Paths.get(fullPath);
+            Files.delete(path);
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
