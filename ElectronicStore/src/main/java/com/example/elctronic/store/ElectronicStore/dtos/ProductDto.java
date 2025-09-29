@@ -1,5 +1,6 @@
 package com.example.elctronic.store.ElectronicStore.dtos;
 
+import com.example.elctronic.store.ElectronicStore.entities.Category;
 import jakarta.persistence.Id;
 import lombok.*;
 
@@ -32,4 +33,6 @@ public class ProductDto {
     private boolean stock;
 
     private String productImageName;
+
+    private CategoryDto category;
 }

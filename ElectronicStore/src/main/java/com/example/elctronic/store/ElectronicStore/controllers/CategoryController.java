@@ -3,8 +3,10 @@ package com.example.elctronic.store.ElectronicStore.controllers;
 import com.example.elctronic.store.ElectronicStore.dtos.ApiResponseMessage;
 import com.example.elctronic.store.ElectronicStore.dtos.CategoryDto;
 import com.example.elctronic.store.ElectronicStore.dtos.PageableResponse;
+import com.example.elctronic.store.ElectronicStore.dtos.ProductDto;
 import com.example.elctronic.store.ElectronicStore.entities.Category;
 import com.example.elctronic.store.ElectronicStore.services.CategoryService;
+import com.example.elctronic.store.ElectronicStore.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,9 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private ProductService productService;
 
     //create
     @PostMapping
@@ -35,6 +40,7 @@ public class CategoryController {
     }
 
     //delete
+    @DeleteMapping("/{categoryId}")
     public ResponseEntity<ApiResponseMessage> deleteCategory(@PathVariable String categoryId){
         categoryService.delete(categoryId);
         ApiResponseMessage responseMessage = ApiResponseMessage.builder().message("Category deleted successfully!!")
@@ -63,5 +69,26 @@ public class CategoryController {
     {
         CategoryDto categoryDto = categoryService.get(categoryId);
         return new ResponseEntity<>(categoryDto, HttpStatus.OK);
+    }
+
+    //create product with category
+    @PostMapping("/{categoryId}/products")
+    public ResponseEntity<ProductDto> createProductWithCategory(
+            @PathVariable("categoryId") String categoryId,
+            @RequestBody ProductDto dto
+    ){
+        ProductDto productWithCategory = productService.createProductWithCategory(dto, categoryId);
+        return new ResponseEntity<>(productWithCategory, HttpStatus.CREATED);
+    }
+
+    //update category of product
+    @PutMapping("/{categoryId}/products/{productId}")
+    public ResponseEntity<ProductDto> updateCategoryOfProduct(
+            @PathVariable String categoryId,
+            @PathVariable String productId
+    )
+    {
+        ProductDto productDto = productService.updateCategory(categoryId, productId);
+        return new ResponseEntity<>(productDto, HttpStatus.OK);
     }
 }

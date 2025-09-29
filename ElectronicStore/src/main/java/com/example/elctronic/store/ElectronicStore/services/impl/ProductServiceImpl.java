@@ -2,9 +2,11 @@ package com.example.elctronic.store.ElectronicStore.services.impl;
 
 import com.example.elctronic.store.ElectronicStore.dtos.PageableResponse;
 import com.example.elctronic.store.ElectronicStore.dtos.ProductDto;
+import com.example.elctronic.store.ElectronicStore.entities.Category;
 import com.example.elctronic.store.ElectronicStore.entities.Product;
 import com.example.elctronic.store.ElectronicStore.exception.ResourceNotFoundException;
 import com.example.elctronic.store.ElectronicStore.helper.Helper;
+import com.example.elctronic.store.ElectronicStore.repositories.CategoryRepository;
 import com.example.elctronic.store.ElectronicStore.repositories.ProductRepository;
 import com.example.elctronic.store.ElectronicStore.services.ProductService;
 import org.modelmapper.ModelMapper;
@@ -34,6 +36,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Value("product.image.path")
     private String imagePath;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @Override
     public ProductDto create(ProductDto productDto) {
@@ -119,4 +124,36 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> page = productRepository.findByTitleContaining(subTitle, pageable);
         return Helper.getPageableResponse(page, ProductDto.class);
     }
+
+    @Override
+    public ProductDto createProductWithCategory(ProductDto productDto, String categoryId) {
+
+        //fetch the category from db
+        Category category = categoryRepository.findById(categoryId).orElseThrow(()->new ResourceNotFoundException("Category not found!!"));
+        Product product = mapper.map(productDto, Product.class);
+
+        String productId = UUID.randomUUID().toString();
+        product.setId(productId);
+
+        productDto.setAddedDate(new Date());
+        product.setCategory(category);
+
+        Product savedProduct = productRepository.save(product);
+        return mapper.map(savedProduct, ProductDto.class);
+
+    }
+
+    @Override
+    public ProductDto updateCategory(String productId, String categoryId) {
+
+        //product fetch
+        Product product = productRepository.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product of given id not found"));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category of the given id not found"));
+
+        product.setCategory(category);
+        Product savedProduct = productRepository.save(product);
+
+        return mapper.map(savedProduct, ProductDto.class);
+    }
+
 }
