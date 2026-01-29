@@ -20,7 +20,9 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,28 +66,30 @@ public class CartServiceImpl implements CartService {
             cart = cartRepository.findByUser(user).get();
         } catch (NoSuchElementException e) {
             cart = new Cart();
+            cart.setCartId(UUID.randomUUID().toString());
             cart.setCreatedAt(new Date());
         }
 
         //perform cart operation
         //if cart items already present, then update
-        AtomicBoolean updated = new AtomicBoolean(false);
+        AtomicReference<Boolean> updated = new AtomicReference<>(false);
         List<CartItem> items = cart.getItems();
-
-        List<CartItem> updatedItems = items.stream().map(item -> {
-
-            if (item.getProduct().getId().equals(productId)) {
+        List <CartItem> updateItems = items.stream().map(item ->{
+            if(item.getProduct().getProductId().equals(productId))
+            {
+                //if already present in the cart
                 item.setQuantity(quantity);
-                item.setTotalPrice(quantity * product.getPrice());
-                 updated.set(true);
+                item.setTotalPrice(quantity*product.getPrice());
+                updated.set(true);
             }
             return item;
         }).collect(Collectors.toList());
 
-        cart.setItems(updatedItems);
+        cart.setItems(updateItems);
 
         //create items
-        if (!updated.get()) {
+
+        if(!updated.get()) {
             CartItem cartItem = CartItem.builder()
                     .quantity(quantity)
                     .totalPrice(quantity * product.getPrice())
@@ -93,12 +97,10 @@ public class CartServiceImpl implements CartService {
                     .product(product)
                     .build();
 
-
             cart.getItems().add(cartItem);
         }
 
             cart.setUser(user);
-
             Cart updatedCart = cartRepository.save(cart);
             return mapper.map(updatedCart, CartDto.class);
         }

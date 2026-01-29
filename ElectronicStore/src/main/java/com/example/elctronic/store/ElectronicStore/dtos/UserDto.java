@@ -14,8 +14,6 @@ import lombok.*;
 @Builder
 public class UserDto {
 
-
-
     private String userId;
 
     @Size(min = 3, max = 70, message = "Invalid Name!!")

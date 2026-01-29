@@ -3,6 +3,8 @@ package com.example.elctronic.store.ElectronicStore.services;
 import com.example.elctronic.store.ElectronicStore.dtos.CategoryDto;
 import com.example.elctronic.store.ElectronicStore.dtos.PageableResponse;
 
+import java.util.List;
+
 public interface CategoryService {
 
     //create
@@ -21,4 +23,5 @@ public interface CategoryService {
     CategoryDto get(String categoryId);
 
     // search
+    List<CategoryDto> searchCategory(String keyword);
 }

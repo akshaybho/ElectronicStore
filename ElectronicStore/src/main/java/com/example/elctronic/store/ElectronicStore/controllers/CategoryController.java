@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/categories")
 public class CategoryController {
@@ -104,5 +106,13 @@ public class CategoryController {
     {
         PageableResponse<ProductDto> response = productService.getAllOfCategory(categoryId, pageNumber, pageSize, sortBy, sortDir);
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // search by keyword
+    @GetMapping("/search/{keyword}")
+    public ResponseEntity<List<CategoryDto>> searchByCategory(@PathVariable String keyword){
+
+        List<CategoryDto> listBySearch = categoryService.searchCategory(keyword);
+        return new ResponseEntity<>(listBySearch, HttpStatus.OK);
     }
 }

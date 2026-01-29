@@ -44,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto create(ProductDto productDto) {
 
         String productId = UUID.randomUUID().toString();
-        productDto.setId(productId);
+        productDto.setProductId(productId);
 
         productDto.setAddedDate(new Date());
 
@@ -133,7 +133,7 @@ public class ProductServiceImpl implements ProductService {
         Product product = mapper.map(productDto, Product.class);
 
         String productId = UUID.randomUUID().toString();
-        product.setId(productId);
+        product.setProductId(productId);
 
         productDto.setAddedDate(new Date());
         product.setCategory(category);

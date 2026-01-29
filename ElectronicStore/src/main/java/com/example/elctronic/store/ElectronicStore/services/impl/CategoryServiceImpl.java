@@ -14,8 +14,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
+import java.util.List;
 import java.util.UUID;
+
+
 @Service
 public class CategoryServiceImpl implements CategoryService {
 
@@ -69,8 +71,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         Page<Category> page = categoryRepository.findAll(pageable);
 
-        PageableResponse<CategoryDto> pageableResponse = Helper.getPageableResponse(page, CategoryDto.class);
-        return pageableResponse;
+        return Helper.getPageableResponse(page, CategoryDto.class);
     }
 
     @Override
@@ -78,5 +79,17 @@ public class CategoryServiceImpl implements CategoryService {
 
         Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new ResourceNotFoundException("Category with this "+categoryId+" is not found"));
         return mapper.map(category, CategoryDto.class);
+    }
+
+    @Override
+    public List<CategoryDto> searchCategory(String keyword) {
+
+        List<Category> categories = categoryRepository.findByTitleContainingIgnoreCase(keyword);
+        return categories.stream().map(this::entityToDto).toList();
+    }
+
+    public CategoryDto entityToDto(Category savedCategory)
+    {
+        return mapper.map(savedCategory, CategoryDto.class);
     }
 }

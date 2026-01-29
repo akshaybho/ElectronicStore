@@ -17,7 +17,8 @@ import java.util.Date;
 public class Product {
 
     @Id
-    private String id;
+    @Column(name = "product_id")
+    private String productId;
 
     private String title;
 

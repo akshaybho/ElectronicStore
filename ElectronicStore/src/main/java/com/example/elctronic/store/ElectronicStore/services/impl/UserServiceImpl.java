@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDto> searchUser(String keyword) {
         List <User> users = userRepository.findByNameContaining(keyword);
-        List <UserDto> userDto = users.stream().map(user->entityToDto(user)).collect(Collectors.toList());
+        List <UserDto> userDto = users.stream().map(this::entityToDto).collect(Collectors.toList());
         return userDto;
     }
 

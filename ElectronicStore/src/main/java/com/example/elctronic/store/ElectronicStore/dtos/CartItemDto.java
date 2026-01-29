@@ -13,8 +13,11 @@ import lombok.*;
 public class CartItemDto {
 
     private int cartItemId;
-    private Product product;
+
+    private ProductDto product;
+
     private int quantity;
+
     private int totalPrice;
-    private Cart cart;
+
 }
