@@ -23,7 +23,7 @@ public class Order {
 
     //PENDING, DELIVERED, DISPATCH
     //enum
-    private String status;
+    private String orderStatus;
 
     //NOT-PAID, PAID
     //enum

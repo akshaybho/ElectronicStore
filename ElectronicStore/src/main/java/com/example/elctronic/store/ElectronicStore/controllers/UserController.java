@@ -6,6 +6,8 @@ import com.example.elctronic.store.ElectronicStore.dtos.PageableResponse;
 import com.example.elctronic.store.ElectronicStore.dtos.UserDto;
 import com.example.elctronic.store.ElectronicStore.services.FileService;
 import com.example.elctronic.store.ElectronicStore.services.UserService;
+import com.example.elctronic.store.ElectronicStore.utils.AppConstants;
+
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -39,27 +41,24 @@ public class UserController {
 
     private Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    //create
+    // create
     @PostMapping
-    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto)
-    {
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
         UserDto userDto1 = userService.createUser(userDto);
         return new ResponseEntity<>(userDto1, HttpStatus.CREATED);
     }
 
-    //update
+    // update
     @PutMapping("/{userId}")
-    public ResponseEntity<UserDto> updateUser(@PathVariable ("userId") String userId,
-                                              @RequestBody UserDto userDto)
-    {
+    public ResponseEntity<UserDto> updateUser(@PathVariable("userId") String userId,
+            @RequestBody UserDto userDto) {
         UserDto updatedUser = userService.updateUser(userDto, userId);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
-    //delete
+    // delete
     @DeleteMapping("/{userId}")
-    public ResponseEntity<ApiResponseMessage> deleteUser(@PathVariable String userId)
-    {
+    public ResponseEntity<ApiResponseMessage> deleteUser(@PathVariable String userId) {
         userService.deleteUser(userId);
         ApiResponseMessage message = ApiResponseMessage
                 .builder()
@@ -70,47 +69,42 @@ public class UserController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
-    //get all
+    // get all
     @GetMapping
     public ResponseEntity<PageableResponse<UserDto>> getAllUsers(
 
-            @RequestParam (value = "pageNumber", defaultValue = "0", required = false) int pageNumber,
-            @RequestParam (value = "pageSize", defaultValue = "10", required = false) int pageSize,
-            @RequestParam (value = "sortBy", defaultValue = "name", required = false) String sortBy,
-            @RequestParam (value = "sortDir", defaultValue = "asc", required = false) String sortDir
-    )
-    {
+            @RequestParam(value = "pageNumber", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(value = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIR, required = false) String sortDir) {
         return new ResponseEntity<>(userService.getAllUser(pageNumber, pageSize, sortBy, sortDir), HttpStatus.OK);
     }
 
-    //get single
+    // get single
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDto> getUser(@PathVariable String userId)
-    {
+    public ResponseEntity<UserDto> getUser(@PathVariable String userId) {
         UserDto singleUser = userService.getUserById(userId);
         return new ResponseEntity<>(singleUser, HttpStatus.OK);
     }
 
-    //get by email
+    // get by email
     @GetMapping("/email/{email}")
-    public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email)
-    {
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
         UserDto singleUser = userService.getUserByEmail(email);
         return new ResponseEntity<>(singleUser, HttpStatus.OK);
     }
 
-    //search user
+    // search user
     @GetMapping("/search/{keywords}")
-    public ResponseEntity<List<UserDto>> searchUser(@PathVariable String keywords)
-    {
-       List <UserDto> searchUserDetail = userService.searchUser(keywords);
+    public ResponseEntity<List<UserDto>> searchUser(@PathVariable String keywords) {
+        List<UserDto> searchUserDetail = userService.searchUser(keywords);
         return new ResponseEntity<>(searchUserDetail, HttpStatus.OK);
     }
 
-    //upload user image
+    // upload user image
     @PostMapping("/image/{userId}")
-    public ResponseEntity<ImageResponse> uploadUserImage(@RequestParam("userImage")MultipartFile image,
-                                                         @PathVariable String userId) throws IOException {
+    public ResponseEntity<ImageResponse> uploadUserImage(@RequestParam("userImage") MultipartFile image,
+            @PathVariable String userId) throws IOException {
 
         String imageName = fileService.uploadFile(image, imageUploadPath);
 
@@ -118,18 +112,19 @@ public class UserController {
         user.setImageName(imageName);
         UserDto userDto = userService.updateUser(user, userId);
 
-        ImageResponse imageResponse = ImageResponse.builder().imageName(imageName).success(true).status(HttpStatus.CREATED).build();
+        ImageResponse imageResponse = ImageResponse.builder().imageName(imageName).success(true)
+                .status(HttpStatus.CREATED).build();
         return new ResponseEntity<>(imageResponse, HttpStatus.CREATED);
 
     }
 
-    //serve user image
+    // serve user image
     @GetMapping("/image/{userId}")
     public void serveUserImage(@PathVariable String userId, HttpServletResponse response) throws IOException {
 
         UserDto user = userService.getUserById(userId);
         logger.info("User image name : {}", user.getImageName());
-        InputStream resource  = fileService.getResource(imageUploadPath, user.getImageName());
+        InputStream resource = fileService.getResource(imageUploadPath, user.getImageName());
 
         response.setContentType(MediaType.IMAGE_JPEG_VALUE);
         StreamUtils.copy(resource, response.getOutputStream());
